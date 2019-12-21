@@ -1,0 +1,5 @@
+PATH_TO_DATA = '/home/witold/Documents/architectural_styles_competition/data'
+PATH_TO_DATA_RAW = f'{PATH_TO_DATA}/raw'
+PATH_TO_DATA_GENERATED = f'{PATH_TO_DATA}/generated'
+PATH_TO_PROJECT = '/home/witold/Documents/architectural_styles_competition'
+PATH_TO_SAVED_MODELS = '/home/witold/Documents/architectural_styles_competition/models/saved'
