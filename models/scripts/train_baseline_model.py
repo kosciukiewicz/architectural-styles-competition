@@ -30,9 +30,9 @@ def main():
         5).map(map_func=normalize_img, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
     model = BaselineModel()
-    results = model.fit(train_dataset=train_ds, test_dataset=test_ds,
+    results = model.fit(run_name="run_1", train_dataset=train_ds, test_dataset=test_ds,
                         optimizer=tf.optimizers.Adam(),
-                        epochs=10)
+                        max_epochs=50, early_stopping=10)
 
 
 if __name__ == '__main__':

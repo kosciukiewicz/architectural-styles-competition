@@ -6,3 +6,11 @@ data/
 __pycache__/
 
 models/saved/
+
+output/simple_model_experiment/
+
+output/simple_model_experiment_batch/
+
+output/
+
+submissions/

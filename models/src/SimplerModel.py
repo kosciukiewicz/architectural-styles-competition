@@ -6,36 +6,39 @@ INPUT_SIZE = (224, 224, 3)
 
 
 class SimplerModel(BaseCompetitionModel):
-    def __init__(self):
+    def __init__(self, freezed_resnet_layers, hidden_dense_size,
+                 dropout):
         """Inits the class."""
         super(SimplerModel, self).__init__()
         self.resnet_layers = None
         self.resnet_dense = None
         self.dense_layers = None
         self.conv_layers = None
-
+        self.dropout = dropout
+        self.freezed_resnet_layers = freezed_resnet_layers
+        self.hidden_dense_size = hidden_dense_size
         self._init_resnet_module()
         # self._init_conv_module()
         # self._init_dense_module()
 
     def _init_resnet_module(self):
-        self.resnet_layers = tf.keras.applications.resnet_v2.ResNet50V2(
+        self.resnet_layers = tf.keras.applications.inception_resnet_v2.InceptionResNetV2(
             weights='imagenet', include_top=False, pooling='avg',
             input_tensor=layers.Input(INPUT_SIZE))
 
-        for layer in self.resnet_layers.layers[:4]:
+        for layer in self.resnet_layers.layers[:self.freezed_resnet_layers]:
             layer.trainable = False
 
         self.resnet_dense = [
             layers.Flatten(),
-            layers.Dense(512, activation=tf.nn.relu,
+            layers.Dense(self.hidden_dense_size, activation=tf.nn.relu,
                          kernel_initializer="glorot_normal"
                          ),
-            layers.Dropout(0.5),
+            layers.Dropout(self.dropout),
             layers.Dense(64, activation=tf.nn.relu,
                          kernel_initializer="glorot_normal"
                          ),
-            layers.Dropout(0.5),
+            layers.Dropout(self.dropout),
             layers.Dense(14, activation=tf.nn.softmax)
         ]
 

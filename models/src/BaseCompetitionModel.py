@@ -42,9 +42,9 @@ class BaseCompetitionModel(tf.keras.Model):
         with tf.GradientTape() as tape:
             predictions = self.call(images)
             labels = tf.expand_dims(labels, 1)
-            l2_loss = tf.add_n(
-                [tf.nn.l2_loss(v) for v in self.trainable_variables])
-            loss = loss_object(labels, predictions) + 0 *l2_loss
+            # l2_loss = tf.add_n(
+            #     [tf.nn.l2_loss(v) for v in self.trainable_variables])
+            loss = loss_object(labels, predictions)
 
         gradients = tape.gradient(loss, self.trainable_variables)
         optimizer.apply_gradients(zip(gradients, self.trainable_variables))
@@ -59,6 +59,8 @@ class BaseCompetitionModel(tf.keras.Model):
         optimizer = kwargs['optimizer']
         early_stopping = kwargs['early_stopping']
         run_name = kwargs['run_name']
+        steps_per_epoch = kwargs.get("steps_per_epoch", None)
+
         loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
 
         test_losses = []
@@ -71,18 +73,23 @@ class BaseCompetitionModel(tf.keras.Model):
         best_val_loss = 100
         learn = True
         epoch = 0
-
         while learn and epoch < max_epochs:
             epoch += 1
             epoch_time_start = time()
 
-            data = [(images, labels) for images, labels in
-                    train_dataset]
-
-            for i in tqdm(range(len(data))):
-                images, labels = data[i]
-                images = tf.cast(images, dtype="float32") / 255.0
-                self.train_step(optimizer, loss_object, images, labels)
+            if steps_per_epoch is None:
+                data = [(images, labels) for images, labels in
+                        train_dataset]
+                for i in tqdm(range(len(data))):
+                    images, labels = data[i]
+                    images = tf.cast(images, dtype="float32") / 255.0
+                    self.train_step(optimizer, loss_object, images, labels)
+            else:
+                it = iter(train_dataset)
+                for _ in tqdm(range(steps_per_epoch)):
+                    images, labels = next(it)
+                    images = tf.cast(images, dtype="float32") / 255.0
+                    self.train_step(optimizer, loss_object, images, labels)
 
             for images, labels in test_datasest:
                 images = tf.cast(images, dtype="float32") / 255.0

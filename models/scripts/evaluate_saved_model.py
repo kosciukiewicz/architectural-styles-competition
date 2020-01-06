@@ -39,11 +39,11 @@ def main():
         (x_train[:2, :, :, :], y_train[:2])).batch(
         50)
 
-    model = SimplerModel()
+    model = SimplerModel(hidden_dense_size=512, dropout=0.5, freezed_resnet_layers=4)
     results = model.fit(train_dataset=train_ds, test_dataset=test_ds,
                         optimizer=tf.optimizers.Adam(), run_name=None,
                         max_epochs=1, early_stopping=-1)
-    model.load_weights(f"{PATH_TO_SAVED_MODELS}/simpler_model/run_5/best.h5",
+    model.load_weights(f"{PATH_TO_SAVED_MODELS}/simpler_model/run_8/best.h5",
                        by_name=True)
 
     pred = np.argmax(model.predict(test_data), axis=1)
